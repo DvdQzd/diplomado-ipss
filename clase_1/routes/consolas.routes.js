@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
     // });
 
     try {
-        const consolas = await Consola.find();
+        const consolas = await Consola.find({ isDeleted: false });
         res.json(consolas);
     } catch (error) {
         res.status(500).json({
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const consola = await Consola.findById(id);
+        const consola = await Consola.find({ _id: id, isDeleted: false });
         if (consola) {
             res.json(consola);
         } else {
@@ -73,6 +73,59 @@ router.post('/', async (req, res) => {
     } catch (error) {
         res.status(400).json({
             mensaje: 'Error al crear la consola', error: error.message
+        });
+    }
+});
+
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const datosActualizados = req.body;
+    try {
+        const consolaActualizada = await Consola.findOneAndReplace({ _id: id }, datosActualizados, { new: true });
+        if (consolaActualizada) {
+            res.json(consolaActualizada);
+        } else {
+            res.status(404).json({ mensaje: 'Consola no encontrada' });
+        }
+    } catch (error) {
+        res.status(400).json({
+            mensaje: 'Error al actualizar la consola', error: error.message
+        });
+    }
+});
+
+router.patch('/:id', async (req, res) => {
+    const { id } = req.params;
+    const datosParciales = req.body;
+    try {
+        const consolaActualizada = await Consola.findByIdAndUpdate(id, datosParciales, { new: true });
+        if (consolaActualizada) {
+            res.json(consolaActualizada);
+        } else {
+            res.status(404).json({ mensaje: 'Consola no encontrada' });
+        }
+    } catch (error) {
+        res.status(400).json({
+            mensaje: 'Error al actualizar la consola', error: error.message
+        });
+    }
+});
+
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const consolaEliminada = await Consola.findById(id);
+
+        if(consolaEliminada){
+            consolaEliminada.deletedAt = true;
+            await consolaEliminada.save();
+            res.json({ mensaje: 'Consola eliminada correctamente' });
+        } else {
+            res.status(404).json({ mensaje: 'Consola no encontrada' });
+        }
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Error al eliminar la consola', error: error.message
         });
     }
 });

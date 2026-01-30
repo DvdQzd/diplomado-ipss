@@ -34,10 +34,14 @@ const consolaSchema = new mongoose.Schema({
     precioEstimado: {
         type: Number,
         min: [0, 'El precio no puede ser negativo']
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true, // Agrega automáticamente createdAt y updatedAt
-    versionKey: false // Elimina el campo __v de versionado
+    versionKey: false, // Elimina el campo __v de versionado
 });
 
 const Consola = mongoose.model('Consola', consolaSchema);
