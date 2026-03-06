@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
                 role: usuario.role
             },
             process.env.JWT_SECRET,
-            { expiresIn: '10s' }
+            { expiresIn: '1d' }
         );
         res.json({ token });
     } catch (error) {
